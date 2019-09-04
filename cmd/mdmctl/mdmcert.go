@@ -72,10 +72,6 @@ func (cmd *mdmcertCommand) Run(args []string) error {
 		os.Exit(1)
 	}
 
-	if err := cmd.setup(); err != nil {
-		return err
-	}
-
 	var run func([]string) error
 	switch strings.ToLower(args[0]) {
 	case "vendor":
@@ -102,6 +98,11 @@ const (
 )
 
 func (cmd *mdmcertCommand) runVendor(args []string) error {
+    
+    if err := cmd.setup(); err != nil {
+		return err
+	}
+	
 	flagset := flag.NewFlagSet("vendor", flag.ExitOnError)
 	flagset.Usage = usageFor(flagset, "mdmctl mdmcert vendor [flags]")
 	var (
@@ -169,6 +170,7 @@ func (cmd *mdmcertCommand) runPush(args []string) error {
 		flCN       = flagset.String("cn", "micromdm-user", "CommonName for the CSR Subject.")
 		flPKeyPass = flagset.String("password", "", "Password to encrypt/read the RSA key.")
 		flKeyPath  = flagset.String("private-key", filepath.Join(mdmcertdir, pushCertificatePrivateKeyFilename), "Path to the push certificate private key. A new RSA key will be created at this path.")
+		flNoLogging	 = flagset.Bool("nolog",false,"Does not log request to server so not configuration file required.")
 
 		flCSRPath = flagset.String("out", filepath.Join(mdmcertdir, pushCSRFilename), "Path to save the MDM Push Certificate request.")
 	)
@@ -177,6 +179,11 @@ func (cmd *mdmcertCommand) runPush(args []string) error {
 		return err
 	}
 
+    if !*flNoLogging {
+        if err := cmd.setup(); err != nil {
+    		return err
+   		}
+	}
 	if err := os.MkdirAll(filepath.Dir(*flCSRPath), 0755); err != nil {
 		errors.Wrapf(err, "create directory %s", filepath.Dir(*flCSRPath))
 	}
@@ -200,6 +207,10 @@ func (cmd *mdmcertCommand) runPush(args []string) error {
 }
 
 func (cmd *mdmcertCommand) runUpload(args []string) error {
+    
+    if err := cmd.setup(); err != nil {
+		return err
+	}
 	flagset := flag.NewFlagSet("upload", flag.ExitOnError)
 	flagset.Usage = usageFor(flagset, "mdmctl mdmcert upload [flags]")
 	var (

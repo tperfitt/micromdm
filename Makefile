@@ -9,7 +9,8 @@ else
 endif
 
 export GO111MODULE=on
-
+CGO_CFLAGS=-mmacosx-version-min=10.12 
+CGO_LDFLAGS=-mmacosx-version-min=10.12 
 VERSION = $(shell git describe --tags --always --dirty)
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 REVISION = $(shell git rev-parse HEAD)
