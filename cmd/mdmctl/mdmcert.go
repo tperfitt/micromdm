@@ -170,7 +170,7 @@ func (cmd *mdmcertCommand) runPush(args []string) error {
 		flCN       = flagset.String("cn", "micromdm-user", "CommonName for the CSR Subject.")
 		flPKeyPass = flagset.String("password", "", "Password to encrypt/read the RSA key.")
 		flKeyPath  = flagset.String("private-key", filepath.Join(mdmcertdir, pushCertificatePrivateKeyFilename), "Path to the push certificate private key. A new RSA key will be created at this path.")
-		flNoLogging	 = flagset.Bool("nolog",false,"Does not log request to server so not configuration file required.")
+		flLocalOnly= flagset.Bool("local-only",false,"No server configuration required.")
 
 		flCSRPath = flagset.String("out", filepath.Join(mdmcertdir, pushCSRFilename), "Path to save the MDM Push Certificate request.")
 	)
@@ -179,7 +179,7 @@ func (cmd *mdmcertCommand) runPush(args []string) error {
 		return err
 	}
 
-    if !*flNoLogging {
+    if !*flLocalOnly {
         if err := cmd.setup(); err != nil {
     		return err
    		}
