@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/gogo/protobuf/proto"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 
 	"github.com/micromdm/micromdm/dep"
 	"github.com/micromdm/micromdm/platform/dep/sync/internal/depsyncproto"
@@ -18,7 +18,7 @@ type Event struct {
 
 func NewEvent(devices []dep.Device) *Event {
 	event := Event{
-		ID:      uuid.NewV4().String(),
+		ID:      uuid.New().String(),
 		Time:    time.Now().UTC(),
 		Devices: devices,
 	}
@@ -35,6 +35,7 @@ func MarshalEvent(e *Event) ([]byte, error) {
 			Description:        d.Description,
 			Color:              d.Color,
 			AssetTag:           d.AssetTag,
+			ProfileStatus:      d.ProfileStatus,
 			ProfileUuid:        d.ProfileUUID,
 			ProfileAssignTime:  d.ProfileAssignTime.UnixNano(),
 			ProfilePushTime:    d.ProfilePushTime.UnixNano(),
@@ -69,6 +70,7 @@ func UnmarshalEvent(data []byte, e *Event) error {
 			Description:        d.GetDescription(),
 			Color:              d.GetColor(),
 			AssetTag:           d.GetAssetTag(),
+			ProfileStatus:      d.GetProfileStatus(),
 			ProfileUUID:        d.GetProfileUuid(),
 			ProfileAssignTime:  time.Unix(0, d.GetProfileAssignTime()).UTC(),
 			ProfilePushTime:    time.Unix(0, d.GetProfilePushTime()).UTC(),

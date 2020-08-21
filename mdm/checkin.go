@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/endpoint"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 func (svc *MDMService) Checkin(ctx context.Context, event CheckinEvent) error {
@@ -25,6 +25,12 @@ func (svc *MDMService) Checkin(ctx context.Context, event CheckinEvent) error {
 	topic, err := topicFromMessage(event.Command.MessageType)
 	if err != nil {
 		return errors.Wrap(err, "get checkin topic from message")
+	}
+
+	if topic == AuthenticateTopic {
+		if err := svc.queue.Clear(ctx, event); err != nil {
+			return errors.Wrap(err, "clearing queue on enrollment attempt")
+		}
 	}
 
 	err = svc.pub.Publish(ctx, topic, msg)
@@ -87,7 +93,7 @@ func decodeCheckinRequest(ctx context.Context, r *http.Request) (interface{}, er
 	}
 
 	event := CheckinEvent{
-		ID:      uuid.NewV4().String(),
+		ID:      uuid.New().String(),
 		Time:    time.Now().UTC(),
 		Command: cmd,
 		Params:  params,
